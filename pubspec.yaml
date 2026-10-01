@@ -42,6 +42,7 @@ dependencies:
   shimmer: ^4.0.0
   flutter_svg: ^2.3.0
   intl: ^0.20.3
+  supabase_flutter: ^2.18.0
 
 dev_dependencies:
   flutter_test:
@@ -67,8 +68,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - asets/images/
-    - asets/icons/
+    - assets/images/
+    - assets/icons/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
