@@ -7,10 +7,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Supabase.initialize(
-    url: SupabaseConstants.url,
-    anonKey: SupabaseConstants.anonKey,
-  );
+  try {
+    await Supabase.initialize(
+      url: SupabaseConstants.url,
+      anonKey: SupabaseConstants.anonKey,
+    );
+  } catch (e) {
+    debugPrint("Supabase init failed: $e");
+  }
 
   runApp(const ProviderScope(child: BookHavenApp()));
 }
