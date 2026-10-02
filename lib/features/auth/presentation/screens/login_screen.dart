@@ -211,7 +211,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('New to bookHaven?',
+                          Text('New to Book Haven?',
                               style: theme.textTheme.bodyMedium),
                           TextButton(
                             onPressed: () => context.push(AppRoutes.register),
@@ -266,7 +266,7 @@ class _Header extends StatelessWidget {
           ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
           const SizedBox(height: 14),
           Text(
-            'bookHaven',
+            'Book Haven',
             style: GoogleFonts.cormorantGaramond(
               fontSize: 32,
               fontWeight: FontWeight.w600,

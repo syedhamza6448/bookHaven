@@ -1,5 +1,5 @@
 name: bookhaven
-description: "A new Flutter project."
+description: "A premium Flutter bookstore app with a Modern Editorial UI. Browse, search and filter books, manage a cart and wishlist, place orders with delivery tracking, and leave reviews, plus an admin panel for managing books, users and orders. Built with Flutter, Dart and Supabase (auth, Postgres, storage)."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

@@ -54,6 +54,19 @@ class AuthRepository {
     );
   }
 
+  Future<AuthResponse> signUpWithEmail({
+    required String fullName,
+    required String email,
+    required String password,
+  }) {
+    return Supabase.instance.client.auth.signUp(
+      email: email,
+      password: password,
+      data: {'full_name': fullName},
+      emailRedirectTo: 'io.supabase.bookhaven://login-callback/',
+    );
+  }
+
   /// Opens the Google sign-in in the browser; the result comes back through
   /// the deep link and is picked up by authStateChanges.
   Future<void> signInWithGoogle() async {
@@ -67,5 +80,26 @@ class AuthRepository {
 
   Future<void> signOut() async {
     await _client?.auth.signOut();
+  }
+
+  Future<void> sendPasswordResetCode(String email) {
+    return Supabase.instance.client.auth.resetPasswordForEmail(email.trim());
+  }
+
+  Future<AuthResponse> verifyPasswordResetCode({
+    required String email,
+    required String code,
+  }) {
+    return Supabase.instance.client.auth.verifyOTP(
+      type: OtpType.recovery,
+      email: email.trim(),
+      token: code.trim(),
+    );
+  }
+
+  Future<UserResponse> updatePassword(String newPassword) {
+    return Supabase.instance.client.auth.updateUser(
+      UserAttributes(password: newPassword),
+    );
   }
 }

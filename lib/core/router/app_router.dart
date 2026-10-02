@@ -1,5 +1,7 @@
 import 'package:bookhaven/core/router/app_routes.dart';
+import 'package:bookhaven/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/login_screen.dart';
+import 'package:bookhaven/features/auth/presentation/screens/register_screen.dart';
 import 'package:bookhaven/features/splash/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +20,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
+        path: AppRoutes.register,
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.home,
         pageBuilder: (context, state) =>
             _fadePage(state, const _PlaceholderScreen('Home')),
@@ -26,17 +36,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.adminDashboard,
         pageBuilder: (context, state) =>
             _fadePage(state, const _PlaceholderScreen('Admin Dashboard')),
-      ),
-      GoRoute(
-        path: AppRoutes.register,
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('Register (coming next)'))),
-      ),
-      GoRoute(
-        path: AppRoutes.forgotPassword,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Forgot password (coming soon)')),
-        ),
       ),
     ],
   );
