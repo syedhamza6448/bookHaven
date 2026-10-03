@@ -9,6 +9,8 @@ class AppRoutes {
   static const forgotPassword = '/forgot-password';
   static const bookList = '/books';
   static const bookDetails = '/book/:id';
+  static const categories = '/categories';
+  static const search = '/search';
 
   static String bookListPath({
     String? title,
@@ -31,4 +33,15 @@ class AppRoutes {
   static String bookDetailsPath(String id, {String? heroTag}) => heroTag == null
       ? '/book/$id'
       : '/book/$id?hero=${Uri.encodeQueryComponent(heroTag)}';
+
+  static String searchPath({String? query, String? genreId}) {
+    final params = <String, String>{
+      if (query != null && query.isNotEmpty) 'q': query,
+      if (genreId != null && genreId.isNotEmpty) 'genre': genreId,
+    };
+    return Uri(
+      path: search,
+      queryParameters: params.isEmpty ? null : params,
+    ).toString();
+  }
 }

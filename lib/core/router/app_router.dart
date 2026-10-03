@@ -5,7 +5,9 @@ import 'package:bookhaven/features/auth/presentation/screens/register_screen.dar
 import 'package:bookhaven/features/catalog/presentation/providers/book_list_controller.dart';
 import 'package:bookhaven/features/catalog/presentation/screens/book_details_screen.dart';
 import 'package:bookhaven/features/catalog/presentation/screens/book_list_screen.dart';
+import 'package:bookhaven/features/catalog/presentation/screens/categories_screen.dart';
 import 'package:bookhaven/features/home/presentation/screens/home_screen.dart';
+import 'package:bookhaven/features/search/presentation/screens/search_screen.dart';
 import 'package:bookhaven/features/splash/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,6 +65,29 @@ final routerProvider = Provider<GoRouter>((ref) {
                 ),
                 child: child,
               ),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.categories,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: CategoriesScreen(
+            initialTab: state.uri.queryParameters['tab'] == 'authors' ? 1 : 0,
+          ),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.search,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: SearchScreen(
+            initialQuery: state.uri.queryParameters['q'],
+            initialGenreId: state.uri.queryParameters['genre'],
+          ),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
         ),
       ),
       GoRoute(

@@ -65,7 +65,7 @@ class HomeScreen extends ConsumerWidget {
               _stagger(
                 HomeSearchBar(
                   onTap: () =>
-                      context.push(AppRoutes.bookListPath(title: 'All Books')),
+                      context.push(AppRoutes.search),
                 ),
                 1,
               ),
