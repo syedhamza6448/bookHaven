@@ -97,7 +97,9 @@ class HomeScreen extends ConsumerWidget {
                       ? const SizedBox.shrink()
                       : FeaturedBanner(
                           book: book,
-                          onTap: () => _soon(context, 'Book Details'),
+                          onTap: () => context.push(
+                            AppRoutes.bookDetailsPath('${book.id}'),
+                          ),
                         ),
                 ),
                 2,
@@ -140,7 +142,12 @@ class HomeScreen extends ConsumerWidget {
                     BookShelf(
                       books: bestsellers,
                       heroPrefix: 'bestseller',
-                      onBookTap: (_) => _soon(context, 'Book Details'),
+                      onBookTap: (book) => context.push(
+                        AppRoutes.bookDetailsPath(
+                          '${book.id}',
+                          heroTag: 'bestseller-${book.id}',
+                        ),
+                      ),
                       onRetry: () => ref.invalidate(bestsellersProvider),
                     ),
                   ],
@@ -163,7 +170,12 @@ class HomeScreen extends ConsumerWidget {
                     BookShelf(
                       books: arrivals,
                       heroPrefix: 'arrival',
-                      onBookTap: (_) => _soon(context, 'Book Details'),
+                      onBookTap: (book) => context.push(
+                        AppRoutes.bookDetailsPath(
+                          '${book.id}',
+                          heroTag: 'arrival-${book.id}',
+                        ),
+                      ),
                       onRetry: () => ref.invalidate(newArrivalsProvider),
                     ),
                   ],

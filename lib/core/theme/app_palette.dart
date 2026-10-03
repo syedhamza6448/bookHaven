@@ -1,7 +1,9 @@
-import 'package:bookhaven/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:bookhaven/core/constants/app_colors.dart';
 
 extension AppPalette on BuildContext {
+  BuildContext get palette => this;
+
   bool get isDark => Theme.of(this).brightness == Brightness.dark;
   Color get bg => isDark ? AppColors.darkBackground : AppColors.lightBackground;
   Color get surface => isDark ? AppColors.darkSurface : AppColors.lightSurface;

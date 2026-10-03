@@ -3,6 +3,7 @@ import 'package:bookhaven/features/auth/presentation/screens/forgot_password_scr
 import 'package:bookhaven/features/auth/presentation/screens/login_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/register_screen.dart';
 import 'package:bookhaven/features/catalog/presentation/providers/book_list_controller.dart';
+import 'package:bookhaven/features/catalog/presentation/screens/book_details_screen.dart';
 import 'package:bookhaven/features/catalog/presentation/screens/book_list_screen.dart';
 import 'package:bookhaven/features/home/presentation/screens/home_screen.dart';
 import 'package:bookhaven/features/splash/presentation/screens/splash_screen.dart';
@@ -43,6 +44,25 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           transitionsBuilder: (context, animation, _, child) =>
               FadeTransition(opacity: animation, child: child),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.bookDetails,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          transitionDuration: const Duration(milliseconds: 400),
+          child: BookDetailsScreen(
+            bookId: state.pathParameters['id']!,
+            heroTag: state.uri.queryParameters['hero'],
+          ),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(
+                opacity: CurvedAnimation(
+                  parent: animation,
+                  curve: Curves.easeOut,
+                ),
+                child: child,
+              ),
         ),
       ),
       GoRoute(

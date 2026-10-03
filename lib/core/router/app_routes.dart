@@ -8,6 +8,7 @@ class AppRoutes {
   static const register = '/register';
   static const forgotPassword = '/forgot-password';
   static const bookList = '/books';
+  static const bookDetails = '/book/:id';
 
   static String bookListPath({
     String? title,
@@ -26,4 +27,8 @@ class AppRoutes {
       queryParameters: params.isEmpty ? null : params,
     ).toString();
   }
+
+  static String bookDetailsPath(String id, {String? heroTag}) => heroTag == null
+      ? '/book/$id'
+      : '/book/$id?hero=${Uri.encodeQueryComponent(heroTag)}';
 }
