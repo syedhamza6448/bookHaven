@@ -2,6 +2,7 @@ import 'package:bookhaven/core/router/app_routes.dart';
 import 'package:bookhaven/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/login_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/register_screen.dart';
+import 'package:bookhaven/features/home/presentation/screens/home_screen.dart';
 import 'package:bookhaven/features/splash/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,8 +30,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.home,
-        pageBuilder: (context, state) =>
-            _fadePage(state, const _PlaceholderScreen('Home')),
+        builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
         path: AppRoutes.adminDashboard,
