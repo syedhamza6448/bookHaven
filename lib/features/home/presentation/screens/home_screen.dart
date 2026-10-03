@@ -1,6 +1,8 @@
+import 'package:bookhaven/core/router/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'package:bookhaven/core/constants/app_dimens.dart';
@@ -16,7 +18,7 @@ import 'package:bookhaven/shared/widgets/section_header.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  // Temporary until Book List, Book Details and Search are built
+  // Temporary until Book Details and Search are built
   void _soon(BuildContext context, String what) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -60,7 +62,13 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: AppDimens.xxl),
             children: [
               _stagger(HomeHeader(name: name), 0),
-              _stagger(HomeSearchBar(onTap: () => _soon(context, 'Search')), 1),
+              _stagger(
+                HomeSearchBar(
+                  onTap: () =>
+                      context.push(AppRoutes.bookListPath(title: 'All Books')),
+                ),
+                1,
+              ),
               _stagger(
                 featured.when(
                   loading: () => Padding(
@@ -104,7 +112,12 @@ class HomeScreen extends ConsumerWidget {
                       error: (_, __) => const SizedBox.shrink(),
                       data: (list) => GenreChips(
                         genres: list,
-                        onTap: (g) => _soon(context, '${g.name} books'),
+                        onTap: (genre) => context.push(
+                          AppRoutes.bookListPath(
+                            title: genre.name,
+                            genreId: genre.id.toString(),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -117,7 +130,12 @@ class HomeScreen extends ConsumerWidget {
                   children: [
                     SectionHeader(
                       title: 'Bestsellers',
-                      onSeeAll: () => _soon(context, 'Book List'),
+                      onSeeAll: () => context.push(
+                        AppRoutes.bookListPath(
+                          title: 'Bestsellers',
+                          sort: 'popular',
+                        ),
+                      ),
                     ),
                     BookShelf(
                       books: bestsellers,
@@ -135,7 +153,12 @@ class HomeScreen extends ConsumerWidget {
                   children: [
                     SectionHeader(
                       title: 'New arrivals',
-                      onSeeAll: () => _soon(context, 'Book List'),
+                      onSeeAll: () => context.push(
+                        AppRoutes.bookListPath(
+                          title: 'New Arrivals',
+                          sort: 'newest',
+                        ),
+                      ),
                     ),
                     BookShelf(
                       books: arrivals,
