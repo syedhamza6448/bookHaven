@@ -1,7 +1,9 @@
 import 'package:bookhaven/core/router/app_routes.dart';
+import 'package:bookhaven/core/router/main_shell.dart';
 import 'package:bookhaven/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/login_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/register_screen.dart';
+import 'package:bookhaven/features/cart/presentation/screens/cart_screen.dart';
 import 'package:bookhaven/features/catalog/presentation/providers/book_list_controller.dart';
 import 'package:bookhaven/features/catalog/presentation/screens/book_details_screen.dart';
 import 'package:bookhaven/features/catalog/presentation/screens/book_list_screen.dart';
@@ -33,10 +35,65 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
+
+      // Main tabs with the bottom navigation bar
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, shell) => MainShell(navigationShell: shell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.categories,
+                builder: (context, state) => CategoriesScreen(
+                  initialTab: state.uri.queryParameters['tab'] == 'authors'
+                      ? 1
+                      : 0,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.cart,
+                builder: (context, state) => const CartScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.wishlist,
+                builder: (context, state) => const TabPlaceholder(
+                  title: 'Wishlist',
+                  icon: Icons.bookmark_rounded,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.profile,
+                builder: (context, state) => const TabPlaceholder(
+                  title: 'Profile',
+                  icon: Icons.person_rounded,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
+
+      // Full-screen pages (cover the bottom navigation bar)
       GoRoute(
         path: AppRoutes.bookList,
         pageBuilder: (context, state) => CustomTransitionPage(
@@ -65,17 +122,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                 ),
                 child: child,
               ),
-        ),
-      ),
-      GoRoute(
-        path: AppRoutes.categories,
-        pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          child: CategoriesScreen(
-            initialTab: state.uri.queryParameters['tab'] == 'authors' ? 1 : 0,
-          ),
-          transitionsBuilder: (context, animation, secondary, child) =>
-              FadeTransition(opacity: animation, child: child),
         ),
       ),
       GoRoute(

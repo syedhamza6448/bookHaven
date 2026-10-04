@@ -4,6 +4,7 @@ import 'package:bookhaven/core/router/app_routes.dart';
 import 'package:bookhaven/core/theme/app_palette.dart';
 import 'package:bookhaven/core/utils/formatters.dart';
 import 'package:bookhaven/features/cart/data/cart_repository.dart';
+import 'package:bookhaven/features/cart/presentation/providers/cart_controller.dart';
 import 'package:bookhaven/features/catalog/data/book_details_repository.dart';
 import 'package:bookhaven/features/catalog/presentation/providers/book_details_providers.dart';
 import 'package:bookhaven/features/catalog/presentation/widgets/book_reviews_section.dart';
@@ -58,8 +59,20 @@ class _BookDetailsScreenState extends ConsumerState<BookDetailsScreen> {
           .read(cartRepositoryProvider)
           .addItem(bookId: widget.bookId, quantity: _qty, stock: book.stock);
       if (!mounted) return;
+      ref.invalidate(cartControllerProvider);
       setState(() => _qty = 1);
-      _snack('Added to your cart ($total in cart)');
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Added to your cart ($total in cart)'),
+          action: SnackBarAction(
+            label: 'VIEW CART',
+            textColor: AppColors.darkAccent,
+            onPressed: () => context.go(AppRoutes.cart),
+          ),
+        ),
+      );
     } catch (_) {
       if (mounted) _snack('Could not add to cart. Try again.');
     } finally {

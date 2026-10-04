@@ -11,6 +11,9 @@ class AppRoutes {
   static const bookDetails = '/book/:id';
   static const categories = '/categories';
   static const search = '/search';
+  static const cart = '/cart';
+  static const wishlist = '/wishlist';
+  static const profile = '/profile';
 
   static String bookListPath({
     String? title,
