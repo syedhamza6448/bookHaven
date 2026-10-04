@@ -89,9 +89,7 @@ class CartScreen extends ConsumerWidget {
               ),
               CartSummary(
                 totals: CartTotals(items),
-                onCheckout: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Checkout is coming up next')),
-                ),
+                onCheckout: () => context.push(AppRoutes.checkout)
               ),
             ],
           );

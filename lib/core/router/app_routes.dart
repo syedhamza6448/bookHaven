@@ -14,6 +14,8 @@ class AppRoutes {
   static const cart = '/cart';
   static const wishlist = '/wishlist';
   static const profile = '/profile';
+  static const checkout = '/checkout';
+  static const orderSuccess = '/order-success/:id';
 
   static String bookListPath({
     String? title,
@@ -47,4 +49,9 @@ class AppRoutes {
       queryParameters: params.isEmpty ? null : params,
     ).toString();
   }
+
+  static String orderSuccessPath(String id, {String? number}) => Uri(
+    path: '/order-success/$id',
+    queryParameters: {if (number != null) 'n': number},
+  ).toString();
 }

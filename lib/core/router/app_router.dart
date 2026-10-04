@@ -8,7 +8,9 @@ import 'package:bookhaven/features/catalog/presentation/providers/book_list_cont
 import 'package:bookhaven/features/catalog/presentation/screens/book_details_screen.dart';
 import 'package:bookhaven/features/catalog/presentation/screens/book_list_screen.dart';
 import 'package:bookhaven/features/catalog/presentation/screens/categories_screen.dart';
+import 'package:bookhaven/features/checkout/presentation/screens/checkout_screen.dart';
 import 'package:bookhaven/features/home/presentation/screens/home_screen.dart';
+import 'package:bookhaven/features/orders/presentation/screens/order_success_screen.dart';
 import 'package:bookhaven/features/search/presentation/screens/search_screen.dart';
 import 'package:bookhaven/features/splash/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -131,6 +133,27 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: SearchScreen(
             initialQuery: state.uri.queryParameters['q'],
             initialGenreId: state.uri.queryParameters['genre'],
+          ),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.checkout,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const CheckoutScreen(),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.orderSuccess,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: OrderSuccessScreen(
+            orderId: state.pathParameters['id']!,
+            orderNumber: state.uri.queryParameters['n'],
           ),
           transitionsBuilder: (context, animation, secondary, child) =>
               FadeTransition(opacity: animation, child: child),
