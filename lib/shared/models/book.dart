@@ -49,7 +49,7 @@ class Book {
     genreId: json['genre_id'] as String,
     genreName: (json['genres'] as Map<String, dynamic>?)?['name'] as String? ?? '',
     description: json['description'] as String? ?? '',
-    coverUrl: json['coverUrl'] as String?,
+    coverUrl: json['cover_url'] as String?,
     price: (json['price'] as num).toDouble(),
     originalPrice: (json['original_price'] as num?)?.toDouble(),
     stock: json['stock'] as int? ?? 0,
