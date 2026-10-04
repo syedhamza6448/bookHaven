@@ -71,15 +71,13 @@ class PaymentSection extends StatelessWidget {
                         ),
                         const SizedBox(height: AppDimens.md),
                         TextFormField(
-                          controller: numberCtrl,
+                          controller: numberCtrl, // keep your existing controller name
                           keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.next,
-                          enableSuggestions: false,
                           inputFormatters: [CardNumberFormatter()],
                           validator: Validators.cardNumber,
                           decoration: const InputDecoration(
                             labelText: 'Card number',
-                            hintText: '4242 4242 4242 4242',
+                            hintText: '1234 5678 9012 3456',
                           ),
                         ),
                         const SizedBox(height: AppDimens.md),
