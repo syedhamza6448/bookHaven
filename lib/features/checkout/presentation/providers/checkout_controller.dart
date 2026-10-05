@@ -1,3 +1,4 @@
+import 'package:bookhaven/features/profile/presentation/providers/profile_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bookhaven/features/cart/presentation/providers/cart_controller.dart';
 import 'package:bookhaven/features/checkout/data/checkout_repository.dart';
@@ -62,6 +63,7 @@ class CheckoutController extends Notifier<CheckoutState> {
           );
       state = state.copyWith(placing: false, done: true);
       ref.invalidate(cartControllerProvider); // cart is now empty on the server
+      ref.invalidate(profileStatsProvider); // cart is now empty on the server
       return order;
     } on CheckoutException catch (e) {
       state = state.copyWith(placing: false, error: e.message);

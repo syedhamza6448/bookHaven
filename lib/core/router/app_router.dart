@@ -11,6 +11,7 @@ import 'package:bookhaven/features/catalog/presentation/screens/categories_scree
 import 'package:bookhaven/features/checkout/presentation/screens/checkout_screen.dart';
 import 'package:bookhaven/features/home/presentation/screens/home_screen.dart';
 import 'package:bookhaven/features/orders/presentation/screens/order_success_screen.dart';
+import 'package:bookhaven/features/profile/presentation/screens/profile_screen.dart';
 import 'package:bookhaven/features/search/presentation/screens/search_screen.dart';
 import 'package:bookhaven/features/splash/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.register,
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
         path: AppRoutes.forgotPassword,
@@ -85,10 +90,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppRoutes.profile,
-                builder: (context, state) => const TabPlaceholder(
-                  title: 'Profile',
-                  icon: Icons.person_rounded,
-                ),
+                builder: (context, state) => const ProfileScreen()
               ),
             ],
           ),
