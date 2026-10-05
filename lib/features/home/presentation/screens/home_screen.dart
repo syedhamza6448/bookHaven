@@ -1,4 +1,5 @@
 import 'package:bookhaven/core/router/app_routes.dart';
+import 'package:bookhaven/features/profile/presentation/providers/profile_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -61,7 +62,11 @@ class HomeScreen extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.only(bottom: AppDimens.xxl),
             children: [
-              _stagger(HomeHeader(name: name), 0),
+              _stagger(HomeHeader(
+                name: name,
+                avatarUrl: ref.watch(profileProvider.select((p) => p.value?.avatarUrl)),
+                onAvatarTap: () => context.go(AppRoutes.profile),
+                ), 0),
               _stagger(
                 HomeSearchBar(
                   onTap: () =>

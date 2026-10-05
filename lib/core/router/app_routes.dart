@@ -16,6 +16,7 @@ class AppRoutes {
   static const profile = '/profile';
   static const checkout = '/checkout';
   static const orderSuccess = '/order-success/:id';
+  static const editProfile = '/edit-profile';
 
   static String bookListPath({
     String? title,

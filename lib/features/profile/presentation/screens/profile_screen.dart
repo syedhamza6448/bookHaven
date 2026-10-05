@@ -113,7 +113,7 @@ class ProfileScreen extends ConsumerWidget {
                           icon: Icons.person_outline_rounded,
                           title: 'Edit profile',
                           subtitle: 'Name and photo',
-                          onTap: () => _soon(context, 'Edit profile'),
+                          onTap: () => context.push(AppRoutes.editProfile),
                         ),
                         ProfileMenuTile(
                           icon: Icons.location_on_outlined,
