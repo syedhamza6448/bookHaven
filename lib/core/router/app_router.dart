@@ -11,6 +11,7 @@ import 'package:bookhaven/features/catalog/presentation/screens/categories_scree
 import 'package:bookhaven/features/checkout/presentation/screens/checkout_screen.dart';
 import 'package:bookhaven/features/home/presentation/screens/home_screen.dart';
 import 'package:bookhaven/features/orders/presentation/screens/order_success_screen.dart';
+import 'package:bookhaven/features/profile/presentation/screens/addresses_screen.dart';
 import 'package:bookhaven/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:bookhaven/features/profile/presentation/screens/profile_screen.dart';
 import 'package:bookhaven/features/search/presentation/screens/search_screen.dart';
@@ -167,6 +168,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
           child: const EditProfileScreen(),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.addresses,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const AddressesScreen(),
           transitionsBuilder: (context, animation, secondary, child) =>
               FadeTransition(opacity: animation, child: child),
         ),
