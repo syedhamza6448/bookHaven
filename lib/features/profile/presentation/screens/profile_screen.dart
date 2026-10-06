@@ -117,9 +117,15 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                         ProfileMenuTile(
                           icon: Icons.location_on_outlined,
-                          title: 'Addresses & payment methods',
-                          subtitle: 'Where and how you pay',
+                          title: 'Addresses',
+                          subtitle: 'Where to deliver',
                           onTap: () => context.push(AppRoutes.addresses),
+                        ),
+                        ProfileMenuTile(
+                          icon: Icons.credit_card_outlined,
+                          title: 'Payment Methods',
+                          subtitle: 'How you pay',
+                          onTap: () => context.push(AppRoutes.paymentMethods),
                         ),
                         ProfileMenuTile(
                           icon: Icons.receipt_long_outlined,
