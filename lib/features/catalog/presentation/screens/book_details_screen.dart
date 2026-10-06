@@ -9,7 +9,9 @@ import 'package:bookhaven/features/catalog/data/book_details_repository.dart';
 import 'package:bookhaven/features/catalog/presentation/providers/book_details_providers.dart';
 import 'package:bookhaven/features/catalog/presentation/widgets/book_reviews_section.dart';
 import 'package:bookhaven/features/catalog/presentation/widgets/related_books_row.dart';
+import 'package:bookhaven/features/profile/presentation/providers/profile_providers.dart';
 import 'package:bookhaven/features/wishlist/data/wishlist_repository.dart';
+import 'package:bookhaven/features/wishlist/presentation/providers/wishlist_controller.dart';
 import 'package:bookhaven/shared/models/book.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +49,8 @@ class _BookDetailsScreenState extends ConsumerState<BookDetailsScreen> {
           .toggle(widget.bookId);
       ref.invalidate(isWishlistedProvider(widget.bookId));
       _snack(now ? 'Saved to your wishlist' : 'Removed from your wishlist');
+      ref.invalidate(wishlistControllerProvider);
+      ref.invalidate(profileStatsProvider);
     } catch (_) {
       _snack('Could not update wishlist. Try again.');
     }
