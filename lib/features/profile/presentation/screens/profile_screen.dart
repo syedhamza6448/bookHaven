@@ -131,7 +131,7 @@ class ProfileScreen extends ConsumerWidget {
                           icon: Icons.receipt_long_outlined,
                           title: 'My orders',
                           subtitle: 'History and delivery tracking',
-                          onTap: () => _soon(context, 'Order history'),
+                          onTap: () => context.push(AppRoutes.orders),
                         ),
                         ProfileMenuTile(
                           icon: Icons.bookmark_border_rounded,

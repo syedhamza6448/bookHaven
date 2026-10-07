@@ -656,7 +656,7 @@ class _BottomBar extends StatelessWidget {
             child: SizedBox(
               height: AppDimens.buttonHeight,
               child: OutlinedButton(
-                onPressed: onOrders,
+                onPressed: () => context.push(AppRoutes.orders),
                 child: const Text('My orders'),
               ),
             ),
@@ -667,7 +667,7 @@ class _BottomBar extends StatelessWidget {
             child: SizedBox(
               height: AppDimens.buttonHeight,
               child: ElevatedButton(
-                onPressed: onContinue,
+                onPressed: () => context.push(AppRoutes.home),
                 child: const Text('Continue shopping'),
               ),
             ),

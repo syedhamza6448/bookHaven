@@ -19,6 +19,7 @@ class AppRoutes {
   static const editProfile = '/edit-profile';
   static const addresses = '/addresses';
   static const paymentMethods = '/payment-methods';
+  static const orders = '/orders';
 
   static String bookListPath({
     String? title,
