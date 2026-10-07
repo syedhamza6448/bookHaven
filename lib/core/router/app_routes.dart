@@ -20,6 +20,7 @@ class AppRoutes {
   static const addresses = '/addresses';
   static const paymentMethods = '/payment-methods';
   static const orders = '/orders';
+  static const orderDetails = '/order/:id';
 
   static String bookListPath({
     String? title,
@@ -58,4 +59,6 @@ class AppRoutes {
     path: '/order-success/$id',
     queryParameters: {if (number != null) 'n': number},
   ).toString();
+
+  static String orderDetailsPath(String id) => '/order/$id';
 }

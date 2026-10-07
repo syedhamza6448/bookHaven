@@ -109,16 +109,7 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
           return OrderHistoryCard(
                 key: ValueKey(order.id),
                 order: order,
-                onTap: () {
-                  // Order Details / Delivery Tracking is the next page.
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(
-                      const SnackBar(
-                        content: Text('Order details are coming next.'),
-                      ),
-                    );
-                },
+                onTap: () => context.push(AppRoutes.orderDetailsPath(order.id)),
               )
               .animate()
               .fadeIn(duration: 320.ms, delay: (45 * math.min(i, 8)).ms)

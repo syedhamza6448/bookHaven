@@ -10,6 +10,7 @@ import 'package:bookhaven/features/catalog/presentation/screens/book_list_screen
 import 'package:bookhaven/features/catalog/presentation/screens/categories_screen.dart';
 import 'package:bookhaven/features/checkout/presentation/screens/checkout_screen.dart';
 import 'package:bookhaven/features/home/presentation/screens/home_screen.dart';
+import 'package:bookhaven/features/orders/presentation/screens/order_details_screen.dart';
 import 'package:bookhaven/features/orders/presentation/screens/order_history_screen.dart';
 import 'package:bookhaven/features/orders/presentation/screens/order_success_screen.dart';
 import 'package:bookhaven/features/profile/presentation/screens/addresses_screen.dart';
@@ -193,6 +194,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.orders,
         pageBuilder: (context, state) => CustomTransitionPage(
           child: const OrderHistoryScreen(),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.orderDetails,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: OrderDetailsScreen(orderId: state.pathParameters['id']!),
           transitionsBuilder: (context, animation, secondary, child) =>
               FadeTransition(opacity: animation, child: child),
         ),
