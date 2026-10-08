@@ -360,7 +360,17 @@ class _BookDetailsScreenState extends ConsumerState<BookDetailsScreen> {
                     ),
                   ),
                 const SizedBox(height: AppDimens.xl),
-                BookReviewsSection(bookId: widget.bookId),
+                BookReviewsSection(
+                  bookId: book.id,
+                  onWriteReview: () => context.push<bool>(
+                    AppRoutes.writeReviewPath(
+                      book.id,
+                      title: book.title,
+                      author: book.authorName,
+                      cover: book.coverUrl, 
+                    )
+                  ),
+                ),
                 const SizedBox(height: AppDimens.xl),
               ],
             ),

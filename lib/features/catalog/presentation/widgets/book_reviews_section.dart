@@ -3,13 +3,20 @@ import 'package:bookhaven/core/theme/app_palette.dart';
 import 'package:bookhaven/features/catalog/presentation/providers/book_details_providers.dart';
 import 'package:bookhaven/features/reviews/data/review_repository.dart';
 import 'package:bookhaven/shared/models/review.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 class BookReviewsSection extends ConsumerStatefulWidget {
-  const BookReviewsSection({super.key, required this.bookId});
+  const BookReviewsSection({
+    super.key,
+    required this.bookId,
+    required this.onWriteReview,
+  });
+
   final String bookId;
+  final VoidCallback onWriteReview;
 
   @override
   ConsumerState<BookReviewsSection> createState() => _BookReviewsSectionState();
@@ -49,11 +56,7 @@ class _BookReviewsSectionState extends ConsumerState<BookReviewsSection> {
             ),
             const Spacer(),
             TextButton(
-              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Write a review is coming up next.'),
-                ),
-              ),
+              onPressed: widget.onWriteReview,
               child: const Text('Write a review'),
             ),
           ],
@@ -73,21 +76,24 @@ class _BookReviewsSectionState extends ConsumerState<BookReviewsSection> {
               ),
             ),
           ),
-          error: (e, _) => Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Could not load reviews.',
-                  style: text.bodyMedium?.copyWith(color: c.textSecondary),
+          error: (e, st) {
+            debugPrint('Reviews load failed: $e\n$st');
+            return Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Could not load reviews.',
+                    style: text.bodyMedium?.copyWith(color: c.textSecondary),
+                  ),
                 ),
-              ),
-              TextButton(
-                onPressed: () =>
-                    ref.invalidate(bookReviewsProvider(widget.bookId)),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
+                TextButton(
+                  onPressed: () =>
+                      ref.invalidate(bookReviewsProvider(widget.bookId)),
+                  child: const Text('Retry'),
+                ),
+              ],
+            );
+          },
           data: (reviews) {
             if (reviews.isEmpty) {
               return Container(
@@ -153,14 +159,30 @@ class _ReviewTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundColor: c.primary,
-                child: Text(
-                  initial,
-                  style: const TextStyle(
-                    color: Color(0xFFF6F1E7),
-                    fontWeight: FontWeight.w600,
+              Container(
+                padding: const EdgeInsets.all(1.5),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: c.accent.withValues(alpha: 0.6),
+                    width: 1.2,
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 18,
+                  backgroundColor: c.primary,
+                  foregroundImage: review.avatarUrl == null
+                      ? null
+                      : CachedNetworkImageProvider(review.avatarUrl!),
+                  onForegroundImageError: review.avatarUrl == null
+                      ? null
+                      : (_, __) {},
+                  child: Text(
+                    initial,
+                    style: const TextStyle(
+                      color: Color(0xFFF6F1E7),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

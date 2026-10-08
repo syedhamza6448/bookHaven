@@ -17,6 +17,7 @@ import 'package:bookhaven/features/profile/presentation/screens/addresses_screen
 import 'package:bookhaven/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:bookhaven/features/profile/presentation/screens/payment_methods_screen.dart';
 import 'package:bookhaven/features/profile/presentation/screens/profile_screen.dart';
+import 'package:bookhaven/features/reviews/presentation/screens/write_review_screen.dart';
 import 'package:bookhaven/features/search/presentation/screens/search_screen.dart';
 import 'package:bookhaven/features/splash/presentation/screens/splash_screen.dart';
 import 'package:bookhaven/features/wishlist/presentation/screens/wishlist_screen.dart';
@@ -206,6 +207,23 @@ final routerProvider = Provider<GoRouter>((ref) {
           transitionsBuilder: (context, animation, secondary, child) =>
               FadeTransition(opacity: animation, child: child),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.writeReview,
+        pageBuilder: (context, state) {
+          final q = state.uri.queryParameters;
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: WriteReviewScreen(
+              bookId: state.pathParameters['bookId']!,
+              title: q['title'] ?? '',
+              authorName: q['author'] ?? '',
+              coverUrl: q['cover'],
+            ),
+            transitionsBuilder: (context, animation, secondary, child) =>
+                FadeTransition(opacity: animation, child: child),
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.adminDashboard,

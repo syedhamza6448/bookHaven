@@ -21,6 +21,7 @@ class AppRoutes {
   static const paymentMethods = '/payment-methods';
   static const orders = '/orders';
   static const orderDetails = '/order/:id';
+  static const writeReview = '/write-review/:bookId';
 
   static String bookListPath({
     String? title,
@@ -61,4 +62,21 @@ class AppRoutes {
   ).toString();
 
   static String orderDetailsPath(String id) => '/order/$id';
+
+  static String writeReviewPath(
+    String bookId, {
+    String? title,
+    String? author,
+    String? cover,
+  }) {
+    final params = <String, String>{
+      if (title != null && title.isNotEmpty) 'title': title,
+      if (author != null && author.isNotEmpty) 'author': author,
+      if (cover != null && cover.isNotEmpty) 'cover': cover,
+    };
+    return Uri(
+      path: '/write-review/$bookId',
+      queryParameters: params.isEmpty ? null : params,
+    ).toString();
+  }
 }
