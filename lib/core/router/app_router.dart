@@ -26,6 +26,7 @@ import 'package:bookhaven/features/profile/presentation/screens/profile_screen.d
 import 'package:bookhaven/features/reviews/presentation/screens/write_review_screen.dart';
 import 'package:bookhaven/features/search/presentation/screens/search_screen.dart';
 import 'package:bookhaven/features/splash/presentation/screens/splash_screen.dart';
+import 'package:bookhaven/features/support/presentation/screens/help_faq_screen.dart';
 import 'package:bookhaven/features/wishlist/presentation/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -230,6 +231,14 @@ final routerProvider = Provider<GoRouter>((ref) {
                 FadeTransition(opacity: animation, child: child),
           );
         },
+      ),
+      GoRoute(
+        path: AppRoutes.helpFaq,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: HelpFaqScreen(),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
       ),
       GoRoute(
         path: AppRoutes.adminDashboard,

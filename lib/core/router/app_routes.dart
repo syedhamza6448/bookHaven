@@ -21,6 +21,8 @@ class AppRoutes {
   static const orders = '/orders';
   static const orderDetails = '/order/:id';
   static const writeReview = '/write-review/:bookId';
+  static const helpFaq = '/help';
+
   // Admnin
   static const adminDashboard = '/admin';
   static const adminBooks = '/admin/books';

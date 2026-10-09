@@ -176,7 +176,7 @@ class ProfileScreen extends ConsumerWidget {
                             ProfileMenuTile(
                               icon: Icons.help_outline_rounded,
                               title: 'Help & FAQ',
-                              onTap: () => _soon(context, 'Help & FAQ'),
+                              onTap: () => context.push(AppRoutes.helpFaq),
                             ),
                             ProfileMenuTile(
                               icon: Icons.logout_rounded,
