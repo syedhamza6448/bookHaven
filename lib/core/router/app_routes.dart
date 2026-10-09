@@ -4,7 +4,6 @@ class AppRoutes {
   static const splash = '/splash';
   static const login = '/login';
   static const home = '/home';
-  static const adminDashboard = '/admin';
   static const register = '/register';
   static const forgotPassword = '/forgot-password';
   static const bookList = '/books';
@@ -22,6 +21,11 @@ class AppRoutes {
   static const orders = '/orders';
   static const orderDetails = '/order/:id';
   static const writeReview = '/write-review/:bookId';
+  // Admnin
+  static const adminDashboard = '/admin';
+  static const adminBooks = '/admin/books';
+  static const adminBookAdd = '/admin/books/new';
+  static const adminBookEdit = '/admin/books/:id/edit';
 
   static String bookListPath({
     String? title,
@@ -79,4 +83,6 @@ class AppRoutes {
       queryParameters: params.isEmpty ? null : params,
     ).toString();
   }
+
+  static String adminBookEditPath(String id) => '/admin/books/$id/edit';
 }

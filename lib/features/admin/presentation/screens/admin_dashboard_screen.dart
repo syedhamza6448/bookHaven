@@ -1,5 +1,6 @@
 import 'package:bookhaven/core/constants/app_colors.dart';
 import 'package:bookhaven/core/constants/app_dimens.dart';
+import 'package:bookhaven/core/router/app_routes.dart';
 import 'package:bookhaven/core/theme/app_palette.dart';
 import 'package:bookhaven/core/utils/formatters.dart';
 import 'package:bookhaven/features/admin/data/admin_dashboard_repository.dart';
@@ -76,7 +77,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                       subtitle:
                           '${s.booksTotal} listed'
                           '${s.outOfStock > 0 ? ' · ${s.outOfStock} out of stock' : ''}',
-                      onTap: () => _soon(context, 'Manage Books'),
+                      onTap: () => context.push(AppRoutes.adminBooks),
                     ),
                     _ActionTile(
                       icon: Icons.receipt_long_outlined,
@@ -175,7 +176,7 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'A quick look at how bookHaven is doing.',
+            'A quick look at how Book Haven is doing.',
             style: Theme.of(context).textTheme.bodyMedium
                 ?.copyWith(color: AppColors.onPrimary.withValues(alpha: 0.75)),
           ),

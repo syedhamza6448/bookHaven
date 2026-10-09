@@ -192,7 +192,7 @@ class ProfileScreen extends ConsumerWidget {
                     const SizedBox(height: 28),
                     Center(
                       child: Text(
-                        'bookHaven 1.0.0',
+                        'Book Haven 1.0.0',
                         style: Theme.of(context).textTheme.bodySmall
                             ?.copyWith(color: c.textSecondary),
                       ),

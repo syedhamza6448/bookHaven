@@ -34,9 +34,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
     final status = results.first ?? AuthStatus.signedOut;
     switch (status) {
-      case AuthStatus.admin:
-        context.go(AppRoutes.adminDashboard);
-      case AuthStatus.user:
+      case AuthStatus.admin || AuthStatus.user:
         context.go(AppRoutes.home);
       case AuthStatus.signedOut:
         context.go(AppRoutes.login);
@@ -73,18 +71,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   left: 0,
                   right: 0,
                   child: Center(
-                    child: CustomPaint(
-                      size: const Size(26, 120),
-                      painter: _RibbonPainter(gold),
-                    )
-                      .animate()
-                      .slideY(
-                        begin: -1,
-                        end: 0,
-                        duration: 900.ms,
-                        curve: Curves.easeOutCubic,
-                      )
-                      .fadeIn(duration: 500.ms),
+                    child:
+                        CustomPaint(
+                              size: const Size(26, 120),
+                              painter: _RibbonPainter(gold),
+                            )
+                            .animate()
+                            .slideY(
+                              begin: -1,
+                              end: 0,
+                              duration: 900.ms,
+                              curve: Curves.easeOutCubic,
+                            )
+                            .fadeIn(duration: 500.ms),
                   ),
                 ),
                 Positioned.fill(
@@ -92,80 +91,80 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     child: Column(
                       children: [
                         const Spacer(flex: 5),
-                            
+
                         Container(
-                          width: 104,
-                          height: 104,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: gold, width: 1.2),
-                          ),
-                          child: const Icon(
-                            Icons.auto_stories_outlined,
-                            size: 46,
-                            color: gold,
-                          ),
-                        )
-                          .animate(delay: 500.ms)
-                          .fadeIn(duration: 700.ms)
-                          .scale(
-                            begin: const Offset(0.8, 0.8),
-                            end: const Offset(1, 1),
-                            duration: 800.ms,
-                            curve: Curves.easeOutBack,
-                          ),
-                            
+                              width: 104,
+                              height: 104,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: gold, width: 1.2),
+                              ),
+                              child: const Icon(
+                                Icons.auto_stories_outlined,
+                                size: 46,
+                                color: gold,
+                              ),
+                            )
+                            .animate(delay: 500.ms)
+                            .fadeIn(duration: 700.ms)
+                            .scale(
+                              begin: const Offset(0.8, 0.8),
+                              end: const Offset(1, 1),
+                              duration: 800.ms,
+                              curve: Curves.easeOutBack,
+                            ),
+
                         const SizedBox(height: 32),
-                            
+
                         Text(
-                          'Book Haven',
-                          style: GoogleFonts.cormorantGaramond(
-                            fontSize: 48,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1,
-                            color: parchment,
+                              'Book Haven',
+                              style: GoogleFonts.cormorantGaramond(
+                                fontSize: 48,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1,
+                                color: parchment,
+                              ),
+                            )
+                            .animate(delay: 900.ms)
+                            .fadeIn(duration: 700.ms)
+                            .slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
+
+                        const SizedBox(height: 14),
+
+                        Container(width: 72, height: 1, color: gold)
+                            .animate(delay: 1300.ms)
+                            .scaleX(
+                              begin: 0,
+                              end: 1,
+                              duration: 600.ms,
+                              curve: Curves.easeOutCubic,
+                              alignment: Alignment.center,
+                            ),
+
+                        const SizedBox(height: 14),
+
+                        Text(
+                          'A HAVEN FOR EVERY READER',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 3.2,
+                            color: parchment.withAlpha(178),
                           ),
-                        )
-                          .animate(delay: 900.ms)
-                          .fadeIn(duration: 700.ms)
-                          .slideY(begin: 0.3, end: 0, curve: Curves.easeOut),
-                            
-                      const SizedBox(height: 14),
-                            
-                      Container(width: 72, height: 1, color: gold)
-                        .animate(delay: 1300.ms)
-                        .scaleX(
-                          begin: 0,
-                          end: 1,
-                          duration: 600.ms,
-                          curve: Curves.easeOutCubic,
-                          alignment: Alignment.center,
-                        ),
-                            
-                      const SizedBox(height: 14),
-                            
-                      Text(
-                        'A HAVEN FOR EVERY READER',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 3.2,
-                          color: parchment.withAlpha(178),
-                        ),
-                      ).animate(delay: 1500.ms).fadeIn(duration: 700.ms),
-                            
-                      const Spacer(flex: 4),
-                            
-                      SizedBox(
-                        width: 56,
-                        child: LinearProgressIndicator(
-                          minHeight: 1.5,
-                          color: gold,
-                          backgroundColor: gold.withAlpha(51),
-                        ),
-                      ).animate(delay: 1700.ms).fadeIn(duration: 500.ms),
-                            
-                      const SizedBox(height: 40),
+                        ).animate(delay: 1500.ms).fadeIn(duration: 700.ms),
+
+                        const Spacer(flex: 4),
+
+                        SizedBox(
+                          width: 56,
+                          child: LinearProgressIndicator(
+                            minHeight: 1.5,
+                            color: gold,
+                            backgroundColor: gold.withAlpha(51),
+                          ),
+                        ).animate(delay: 1700.ms).fadeIn(duration: 500.ms),
+
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
