@@ -83,7 +83,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                       icon: Icons.receipt_long_outlined,
                       title: 'Orders',
                       subtitle: '${s.ordersPending} waiting to be processed',
-                      onTap: () => _soon(context, 'Manage Orders'),
+                      onTap: () => context.push(AppRoutes.adminOrders),
                     ),
                     _ActionTile(
                       icon: Icons.people_outline,

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:bookhaven/core/constants/app_dimens.dart';
 import 'package:bookhaven/core/constants/app_colors.dart';
 import 'package:bookhaven/core/router/app_routes.dart';
@@ -51,9 +52,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final status = await ref.read(authRepositoryProvider).resolveStatus();
     if (!mounted) return;
     switch (status) {
-      case AuthStatus.admin:
-        context.go(AppRoutes.adminDashboard);
-      case AuthStatus.user:
+      case AuthStatus.admin || AuthStatus.user:
         context.go(AppRoutes.home);
       case AuthStatus.signedOut:
         _navigated = false;
@@ -101,129 +100,166 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('SIGN IN',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                            color: gold, letterSpacing: 2.4)),
-                    const SizedBox(height: AppDimens.sm),
-                    Text(
-                      'Welcome back.',
-                      style: GoogleFonts.cormorantGaramond(
-                        fontSize: 40,
-                        fontWeight: FontWeight.w600,
-                        height: 1.05,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: AppDimens.md),
-                    Container(width: 48, height: 1.5, color: gold),
-                    const SizedBox(height: AppDimens.md),
-                    Text(
-                      'Pick up where you left off in your next chapter.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.65)),
-                    ),
-                    const SizedBox(height: AppDimens.xl),
-                    AppTextField(
-                      controller: _emailCtrl,
-                      label: 'Email',
-                      icon: Icons.mail_outline,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      validator: Validators.email,
-                    ),
-                    const SizedBox(height: AppDimens.lg),
-                    AppTextField(
-                      controller: _passCtrl,
-                      label: 'Password',
-                      icon: Icons.lock_outline,
-                      isPassword: true,
-                      textInputAction: TextInputAction.done,
-                      validator: Validators.password,
-                      onSubmitted: (_) => _submit(),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => context.push(AppRoutes.forgotPassword),
-                        child: const Text('Forgot password?'),
-                      ),
-                    ),
-                    const SizedBox(height: AppDimens.sm),
-                    AppPrimaryButton(
-                      label: 'Sign In',
-                      isLoading: state.isLoading,
-                      onPressed: state.isGoogleLoading ? null : _submit,
-                    ),
-                    const SizedBox(height: AppDimens.xl),
-                    Row(children: [
-                      Expanded(child: Divider(color: theme.dividerColor)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text('OR',
-                            style: theme.textTheme.labelMedium
-                                ?.copyWith(letterSpacing: 2)),
-                      ),
-                      Expanded(child: Divider(color: theme.dividerColor)),
-                    ]),
-                    const SizedBox(height: AppDimens.xl),
-                    SizedBox(
-                      width: double.infinity,
-                      height: AppDimens.buttonHeight,
-                      child: OutlinedButton(
-                        onPressed: (state.isLoading || state.isGoogleLoading)
-                            ? null
-                            : () => ref
-                                .read(loginControllerProvider.notifier)
-                                .signInWithGoogle(),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: theme.dividerColor),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(AppDimens.radiusButton),
-                          ),
-                        ),
-                        child: state.isGoogleLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2))
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                  children:
+                      [
+                            Text(
+                              'SIGN IN',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: gold,
+                                letterSpacing: 2.4,
+                              ),
+                            ),
+                            const SizedBox(height: AppDimens.sm),
+                            Text(
+                              'Welcome back.',
+                              style: GoogleFonts.cormorantGaramond(
+                                fontSize: 40,
+                                fontWeight: FontWeight.w600,
+                                height: 1.05,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: AppDimens.md),
+                            Container(width: 48, height: 1.5, color: gold),
+                            const SizedBox(height: AppDimens.md),
+                            Text(
+                              'Pick up where you left off in your next chapter.',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.65,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: AppDimens.xl),
+                            AppTextField(
+                              controller: _emailCtrl,
+                              label: 'Email',
+                              icon: Icons.mail_outline,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              validator: Validators.email,
+                            ),
+                            const SizedBox(height: AppDimens.lg),
+                            AppTextField(
+                              controller: _passCtrl,
+                              label: 'Password',
+                              icon: Icons.lock_outline,
+                              isPassword: true,
+                              textInputAction: TextInputAction.done,
+                              validator: Validators.password,
+                              onSubmitted: (_) => _submit(),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () =>
+                                    context.push(AppRoutes.forgotPassword),
+                                child: const Text('Forgot password?'),
+                              ),
+                            ),
+                            const SizedBox(height: AppDimens.sm),
+                            AppPrimaryButton(
+                              label: 'Sign In',
+                              isLoading: state.isLoading,
+                              onPressed: state.isGoogleLoading ? null : _submit,
+                            ),
+                            const SizedBox(height: AppDimens.xl),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(color: theme.dividerColor),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
+                                  child: Text(
+                                    'OR',
+                                    style: theme.textTheme.labelMedium
+                                        ?.copyWith(letterSpacing: 2),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Divider(color: theme.dividerColor),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: AppDimens.xl),
+                            SizedBox(
+                              width: double.infinity,
+                              height: AppDimens.buttonHeight,
+                              child: OutlinedButton(
+                                onPressed:
+                                    (state.isLoading || state.isGoogleLoading)
+                                    ? null
+                                    : () => ref
+                                          .read(
+                                            loginControllerProvider.notifier,
+                                          )
+                                          .signInWithGoogle(),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(color: theme.dividerColor),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                      AppDimens.radiusButton,
+                                    ),
+                                  ),
+                                ),
+                                child: state.isGoogleLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'G',
+                                            style:
+                                                GoogleFonts.cormorantGaramond(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: gold,
+                                                ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Text(
+                                            'Continue with Google',
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.onSurface,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                              ),
+                            ),
+                            const SizedBox(height: AppDimens.xl),
+                            Center(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text('G',
-                                      style: GoogleFonts.cormorantGaramond(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.w700,
-                                          color: gold)),
-                                  const SizedBox(width: 12),
-                                  Text('Continue with Google',
-                                      style: TextStyle(
-                                          color: theme.colorScheme.onSurface,
-                                          fontWeight: FontWeight.w600)),
+                                  Text(
+                                    'New to Book Haven?',
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        context.push(AppRoutes.register),
+                                    child: const Text('Create an account'),
+                                  ),
                                 ],
                               ),
-                      ),
-                    ),
-                    const SizedBox(height: AppDimens.xl),
-                    Center(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('New to Book Haven?',
-                              style: theme.textTheme.bodyMedium),
-                          TextButton(
-                            onPressed: () => context.push(AppRoutes.register),
-                            child: const Text('Create an account'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ]
-                      .animate(interval: 60.ms)
-                      .fadeIn(duration: 450.ms)
-                      .slideY(begin: 0.08, end: 0, curve: Curves.easeOut),
+                            ),
+                          ]
+                          .animate(interval: 60.ms)
+                          .fadeIn(duration: 450.ms)
+                          .slideY(begin: 0.08, end: 0, curve: Curves.easeOut),
                 ),
               ),
             ),
@@ -261,8 +297,11 @@ class _Header extends StatelessWidget {
               shape: BoxShape.circle,
               color: AppColors.darkAccent,
             ),
-            child: const Icon(Icons.auto_stories,
-                color: AppColors.lightPrimary, size: 30),
+            child: const Icon(
+              Icons.auto_stories,
+              color: AppColors.lightPrimary,
+              size: 30,
+            ),
           ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
           const SizedBox(height: 14),
           Text(

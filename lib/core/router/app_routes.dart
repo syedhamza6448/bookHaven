@@ -26,6 +26,8 @@ class AppRoutes {
   static const adminBooks = '/admin/books';
   static const adminBookAdd = '/admin/books/new';
   static const adminBookEdit = '/admin/books/:id/edit';
+  static const adminOrders = '/admin/orders';
+  static const adminOrderDetail = '/admin/orders/:id';
 
   static String bookListPath({
     String? title,
@@ -85,4 +87,6 @@ class AppRoutes {
   }
 
   static String adminBookEditPath(String id) => '/admin/books/$id/edit';
+
+  static String adminOrderDetailPath(String id) => '/admin/orders/$id';
 }

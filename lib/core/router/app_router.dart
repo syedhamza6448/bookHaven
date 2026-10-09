@@ -1,8 +1,10 @@
 import 'package:bookhaven/core/router/app_routes.dart';
 import 'package:bookhaven/core/router/main_shell.dart';
 import 'package:bookhaven/features/admin/presentation/screens/admin_dashboard_screen.dart';
+import 'package:bookhaven/features/admin/presentation/screens/admin_order_detail_providers.dart';
 import 'package:bookhaven/features/admin/presentation/screens/book_form_screen.dart';
 import 'package:bookhaven/features/admin/presentation/screens/manage_books_screen.dart';
+import 'package:bookhaven/features/admin/presentation/screens/manage_orders_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/login_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/register_screen.dart';
@@ -260,6 +262,24 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
           child: BookFormScreen(bookId: state.pathParameters['id']!),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.adminOrders,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: ManageOrdersScreen(),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.adminOrderDetail,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: AdminOrderDetailScreen(orderId: state.pathParameters['id']!),
           transitionsBuilder: (context, animation, secondary, child) =>
               FadeTransition(opacity: animation, child: child),
         ),
