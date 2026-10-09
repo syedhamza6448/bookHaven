@@ -89,7 +89,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                       icon: Icons.people_outline,
                       title: 'Users',
                       subtitle: '${s.usersTotal} registered customers',
-                      onTap: () => _soon(context, 'Manage Users'),
+                      onTap: () => context.push(AppRoutes.adminUsers),
                     ),
                     const SizedBox(height: AppDimens.xl),
                     _SectionLabel('Recent orders'),

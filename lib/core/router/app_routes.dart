@@ -28,6 +28,7 @@ class AppRoutes {
   static const adminBookEdit = '/admin/books/:id/edit';
   static const adminOrders = '/admin/orders';
   static const adminOrderDetail = '/admin/orders/:id';
+  static const adminUsers = '/admin/users';
 
   static String bookListPath({
     String? title,
