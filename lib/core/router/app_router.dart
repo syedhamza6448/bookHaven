@@ -1,5 +1,6 @@
 import 'package:bookhaven/core/router/app_routes.dart';
 import 'package:bookhaven/core/router/main_shell.dart';
+import 'package:bookhaven/features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/login_screen.dart';
 import 'package:bookhaven/features/auth/presentation/screens/register_screen.dart';
@@ -227,8 +228,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.adminDashboard,
-        pageBuilder: (context, state) =>
-            _fadePage(state, const _PlaceholderScreen('Admin Dashboard')),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const AdminDashboardScreen(),
+          transitionsBuilder: (context, animation, secondary, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
       ),
     ],
   );
