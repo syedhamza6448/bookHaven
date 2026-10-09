@@ -1,8 +1,8 @@
-import 'package:bookhaven/core/theme/app_palette.dart';
-import 'package:bookhaven/features/cart/presentation/providers/cart_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bookhaven/features/cart/presentation/providers/cart_controller.dart';
+import 'package:bookhaven/shared/widgets/notch_nav_bar.dart';
 
 class MainShell extends ConsumerWidget {
   const MainShell({super.key, required this.navigationShell});
@@ -11,8 +11,8 @@ class MainShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.palette;
-    final count = ref.watch(cartCountProvider);
+    // Keep whatever you already use for the cart count here
+    final cartCount = ref.watch(cartCountProvider);
 
     return PopScope(
       canPop: navigationShell.currentIndex == 0,
@@ -21,79 +21,38 @@ class MainShell extends ConsumerWidget {
       },
       child: Scaffold(
         body: navigationShell,
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: navigationShell.currentIndex,
-          onDestinationSelected: (i) => navigationShell.goBranch(
+        bottomNavigationBar: NotchNavBar(
+          currentIndex: navigationShell.currentIndex,
+          onTap: (i) => navigationShell.goBranch(
             i,
             initialLocation: i == navigationShell.currentIndex,
           ),
-          destinations: [
-            const NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home_rounded),
+          items: [
+            const NotchNavItem(
+              icon: Icons.home_outlined,
+              activeIcon: Icons.home_rounded,
               label: 'Home',
             ),
-            const NavigationDestination(
-              icon: Icon(Icons.grid_view_outlined),
-              selectedIcon: Icon(Icons.grid_view_rounded),
+            const NotchNavItem(
+              icon: Icons.grid_view_outlined,
+              activeIcon: Icons.grid_view_rounded,
               label: 'Browse',
             ),
-            NavigationDestination(
-              icon: Badge(
-                isLabelVisible: count > 0,
-                backgroundColor: c.accent,
-                textColor: Colors.black,
-                label: Text('$count'),
-                child: const Icon(Icons.shopping_bag_outlined),
-              ),
-              selectedIcon: Badge(
-                isLabelVisible: count > 0,
-                backgroundColor: c.accent,
-                textColor: Colors.black,
-                label: Text('$count'),
-                child: const Icon(Icons.shopping_bag_rounded),
-              ),
+            NotchNavItem(
+              icon: Icons.shopping_bag_outlined,
+              activeIcon: Icons.shopping_bag_rounded,
               label: 'Cart',
+              badge: cartCount,
             ),
-            const NavigationDestination(
-              icon: Icon(Icons.bookmark_border_rounded),
-              selectedIcon: Icon(Icons.bookmark_rounded),
+            const NotchNavItem(
+              icon: Icons.bookmark_border_rounded,
+              activeIcon: Icons.bookmark_rounded,
               label: 'Wishlist',
             ),
-            const NavigationDestination(
-              icon: Icon(Icons.person_outline_rounded),
-              selectedIcon: Icon(Icons.person_rounded),
+            const NotchNavItem(
+              icon: Icons.person_outline_rounded,
+              activeIcon: Icons.person_rounded,
               label: 'Profile',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Temporary tab body until Wishlist and Profile are built in Phase 4.
-class TabPlaceholder extends StatelessWidget {
-  const TabPlaceholder({super.key, required this.title, required this.icon});
-
-  final String title;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.palette;
-    return Scaffold(
-      backgroundColor: c.bg,
-      appBar: AppBar(title: Text(title), centerTitle: false),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 56, color: c.accent),
-            const SizedBox(height: 12),
-            Text(
-              '$title is coming soon',
-              style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
         ),
