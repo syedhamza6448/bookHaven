@@ -16,7 +16,7 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
-  static const _minDisplay = Duration(milliseconds: 30000);
+  static const _minDisplay = Duration(milliseconds: 3000);
 
   @override
   void initState() {
@@ -92,18 +92,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                       children: [
                         const Spacer(flex: 5),
 
-                        Container(
-                              width: 104,
-                              height: 104,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: gold, width: 1.2),
-                              ),
-                              child: const Icon(
-                                Icons.auto_stories_outlined,
-                                size: 46,
-                                color: gold,
-                              ),
+                        Image.asset(
+                              'assets/icons/app_icon_foreground.png',
+                              width: 130,
+                              height: 130,
+                              fit: BoxFit.contain,
                             )
                             .animate(delay: 500.ms)
                             .fadeIn(duration: 700.ms)
@@ -114,7 +107,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                               curve: Curves.easeOutBack,
                             ),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 28),
 
                         Text(
                               'Book Haven',

@@ -1,7 +1,7 @@
 class AppStrings {
   AppStrings._();
 
-  static const String appName = 'BookHaven';
+  static const String appName = 'Book Haven';
   static const String tagline = 'Every story, within reach';
 
   // Auth
