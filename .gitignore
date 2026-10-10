@@ -10,6 +10,7 @@
 .history
 .svn/
 .swiftpm/
+.agents/
 migrate_working_dir/
 
 # IntelliJ related
@@ -49,3 +50,7 @@ app.*.map.json
 
 
 lib/core/constants/supabase_constants.dart
+
+skills-lock.json
+brag-output/
+test_vo.wav

@@ -131,7 +131,7 @@ class WishlistScreen extends ConsumerWidget {
                     ),
                   ];
                 }
-                final rowCount = (books.length / 2).ceil();
+                final rowCount = (books.length / kBooksPerShelf).ceil();
                 return [
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(
@@ -142,9 +142,12 @@ class WishlistScreen extends ConsumerWidget {
                     ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate((context, i) {
-                        final pair = books.skip(i * 2).take(2).toList();
+                        final shelf = books
+                            .skip(i * kBooksPerShelf)
+                            .take(kBooksPerShelf)
+                            .toList();
                         return WishlistShelfRow(
-                              books: pair,
+                              books: shelf,
                               onOpen: (b, tag) => _open(context, b, tag),
                               onRemove: (b) => _remove(context, ref, b),
                               onMoveToCart: (b) => _moveToCart(context, ref, b),

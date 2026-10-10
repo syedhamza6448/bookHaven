@@ -1,393 +1,390 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:math' as math;
 
-import 'package:bookhaven/core/constants/app_dimens.dart';
-import 'package:bookhaven/core/theme/app_palette.dart';
-import 'package:bookhaven/core/utils/formatters.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
+import 'package:sensors_plus/sensors_plus.dart';
+
 import 'package:bookhaven/shared/models/book.dart';
 
-class WishlistShelfRow extends StatelessWidget {
+import 'book_open_transition.dart';
+import 'book_spine.dart';
+
+const double _kMaxLean = 0.46; // ~26 degrees
+const double _kPlankH = 16;
+const double _kWallPad = 2;
+const double _kRestPad = 14;
+const double _kGap = 2;
+const int kBooksPerShelf = 6;
+
+/// If the books fall the wrong way on your phone, change this to -1.
+const double _kSensorDirection = 1;
+
+class WishlistShelfRow extends StatefulWidget {
   const WishlistShelfRow({
     super.key,
     required this.books,
     required this.onOpen,
     required this.onRemove,
     required this.onMoveToCart,
+    this.showPlank = true,
   });
 
-  /// 1 or 2 books.
+  /// Place this row full-width (outside page padding) so the phone edges
+  /// act as the walls.
   final List<Book> books;
+
+  /// Called once the book-opening animation has covered the screen.
   final void Function(Book book, String heroTag) onOpen;
   final void Function(Book book) onRemove;
-  final Future<void> Function(Book book) onMoveToCart;
-
-  static String heroTagFor(Book b) => 'wishlist-${b.id}';
+  final void Function(Book book) onMoveToCart;
+  final bool showPlank;
 
   @override
-  Widget build(BuildContext context) {
-    final c = context.palette;
-    const gap = 16.0;
-
-    Widget slot(int i, Widget Function(Book b) builder) {
-      return Expanded(
-        child: i < books.length ? builder(books[i]) : const SizedBox.shrink(),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppDimens.xxl),
-      child: Column(
-        children: [
-          // Covers standing on the shelf
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                slot(
-                  0,
-                  (b) => _Cover(
-                    book: b,
-                    heroTag: heroTagFor(b),
-                    onTap: () => onOpen(b, heroTagFor(b)),
-                    onRemove: () => onRemove(b),
-                  ),
-                ),
-                const SizedBox(width: gap),
-                slot(
-                  1,
-                  (b) => _Cover(
-                    book: b,
-                    heroTag: heroTagFor(b),
-                    onTap: () => onOpen(b, heroTagFor(b)),
-                    onRemove: () => onRemove(b),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // The plank
-          Container(
-            height: 12,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(3),
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [c.border, Color.lerp(c.border, Colors.black, 0.2)!],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.12),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppDimens.md),
-          // Title, price, action
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                slot(
-                  0,
-                  (b) => _Details(
-                    book: b,
-                    onOpen: () => onOpen(b, heroTagFor(b)),
-                    onMoveToCart: () => onMoveToCart(b),
-                  ),
-                ),
-                const SizedBox(width: gap),
-                slot(
-                  1,
-                  (b) => _Details(
-                    book: b,
-                    onOpen: () => onOpen(b, heroTagFor(b)),
-                    onMoveToCart: () => onMoveToCart(b),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<WishlistShelfRow> createState() => _WishlistShelfRowState();
 }
 
-class _Cover extends StatelessWidget {
-  const _Cover({
-    required this.book,
-    required this.heroTag,
-    required this.onTap,
-    required this.onRemove,
-  });
-
-  final Book book;
-  final String heroTag;
-  final VoidCallback onTap;
-  final VoidCallback onRemove;
+class _WishlistShelfRowState extends State<WishlistShelfRow>
+    with SingleTickerProviderStateMixin {
+  final _tilt = ValueNotifier<double>(0);
+  final _keys = <String, GlobalKey>{};
+  final _leans = <String, double>{};
+  late final Ticker _ticker;
+  StreamSubscription<AccelerometerEvent>? _sub;
+  Duration _last = Duration.zero;
+  double _target = 0, _pos = 0, _vel = 0;
+  String? _pulledId;
 
   @override
-  Widget build(BuildContext context) {
-    final c = context.palette;
-    final url = book.coverUrl ?? '';
+  void initState() {
+    super.initState();
+    _ticker = createTicker(_onTick)..start();
+  }
 
-    Widget fallback() => Container(
-      color: c.surface,
-      alignment: Alignment.center,
-      padding: const EdgeInsets.all(AppDimens.md),
-      child: Text(
-        book.title,
-        textAlign: TextAlign.center,
-        maxLines: 4,
-        overflow: TextOverflow.ellipsis,
-        style: Theme.of(context).textTheme.titleMedium
-            ?.copyWith(color: c.textSecondary),
-      ),
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Only listen while this tab is actually visible (saves battery).
+    if (TickerMode.of(context)) {
+      _listen();
+    } else {
+      _stop();
+    }
+  }
+
+  void _listen() {
+    _sub ??=
+        accelerometerEventStream(samplingPeriod: SensorInterval.gameInterval)
+            .listen((e) {
+              var t = (_kSensorDirection * -e.x / 4.5).clamp(
+                -1.0,
+                1.0,
+              ); // full lean at ~27 deg
+              const dead = 0.12;
+              t = t.abs() < dead ? 0 : t.sign * (t.abs() - dead) / (1 - dead);
+              _target = t;
+            }, onError: (_) => _target = 0);
+  }
+
+  void _stop() {
+    _sub?.cancel();
+    _sub = null;
+    _target = 0;
+  }
+
+  void _onTick(Duration elapsed) {
+    final dt = ((elapsed - _last).inMicroseconds / 1e6).clamp(0.0, 0.05);
+    _last = elapsed;
+    if (dt == 0) return;
+    const k = 70.0, c = 9.5; // spring + damping (slightly bouncy)
+    _vel += (k * (_target - _pos) - c * _vel) * dt;
+    _pos += _vel * dt;
+    if ((_pos - _tilt.value).abs() > 0.0004) _tilt.value = _pos;
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    _sub?.cancel();
+    _tilt.dispose();
+    super.dispose();
+  }
+
+  // ---------------------------------------------------------------- layout
+
+  _Dims _dims(double width) {
+    final n = widget.books.length;
+    var w = <double>[];
+    final h = <double>[];
+    for (final b in widget.books) {
+      final s = stableSeed(b.id);
+      w.add(24 + (s % 9).toDouble());
+      h.add(150 + ((s ~/ 7) % 36).toDouble());
+    }
+    final hMax = h.reduce(math.max);
+    // make sure the fully-leaning pile still fits in the row
+    final avail = width - 2 * _kWallPad - hMax * math.sin(_kMaxLean);
+    final needed = w.fold<double>(0, (a, b) => a + b) / math.cos(_kMaxLean);
+    if (needed > avail && n > 0) {
+      final f = avail / needed;
+      w = [for (final x in w) x * f];
+    }
+    return _Dims(w, h, hMax + _kPlankH + 14);
+  }
+
+  List<_Placed> _place(_Dims d, double width, double t) {
+    final n = d.w.length;
+    final a = t.abs().clamp(0.0, 1.1);
+    final side = t >= 0 ? 1 : -1;
+    final theta = _kMaxLean * a;
+    final sinT = math.sin(theta), cosT = math.cos(theta);
+
+    final restLeft = List<double>.filled(n, 0);
+    var x = _kRestPad;
+    for (var i = 0; i < n; i++) {
+      restLeft[i] = x;
+      x += d.w[i] + _kGap;
+    }
+
+    // fully-fallen pivot positions (pivot = bottom corner on the downhill side)
+    final packed = List<double>.filled(n, 0);
+    if (side == 1) {
+      final wall = width - _kWallPad;
+      packed[n - 1] = wall - d.h[n - 1] * sinT;
+      for (var i = n - 2; i >= 0; i--) {
+        packed[i] = packed[i + 1] - d.w[i + 1] / cosT;
+      }
+      var over = 0.0;
+      for (var i = 0; i < n; i++) {
+        over = math.max(over, packed[i] + d.h[i] * sinT - wall);
+      }
+      if (over > 0) {
+        for (var i = 0; i < n; i++) {
+          packed[i] -= over;
+        }
+      }
+    } else {
+      const wall = _kWallPad;
+      packed[0] = wall + d.h[0] * sinT;
+      for (var i = 1; i < n; i++) {
+        packed[i] = packed[i - 1] + d.w[i - 1] / cosT;
+      }
+      var under = 0.0;
+      for (var i = 0; i < n; i++) {
+        under = math.max(under, wall - (packed[i] - d.h[i] * sinT));
+      }
+      if (under > 0) {
+        for (var i = 0; i < n; i++) {
+          packed[i] += under;
+        }
+      }
+    }
+
+    return List.generate(n, (i) {
+      final rank = side == 1
+          ? (n - 1 - i)
+          : i; // books nearest the wall move first
+      final frac = n > 1 ? rank / (n - 1) : 0.0;
+      final s = Curves.easeOutCubic.transform(
+        ((a * 2.4) - frac * 0.9).clamp(0.0, 1.0),
+      );
+      final restPivot = side == 1 ? restLeft[i] + d.w[i] : restLeft[i];
+      final pivot = restPivot + (packed[i] - restPivot) * s;
+      return _Placed(
+        left: side == 1 ? pivot - d.w[i] : pivot,
+        angle: side * theta,
+        alignment: side == 1 ? Alignment.bottomRight : Alignment.bottomLeft,
+      );
+    });
+  }
+
+  // --------------------------------------------------------------- actions
+
+  Future<void> _open(Book book) async {
+    if (_pulledId != null) return;
+    final onOpen = widget.onOpen;
+    final tag = 'wishlist-${book.id}';
+    final box =
+        _keys[book.id]?.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) {
+      onOpen(book, tag);
+      return;
+    }
+    final center = box.localToGlobal(box.size.center(Offset.zero));
+    setState(() => _pulledId = book.id);
+    await playBookOpenTransition(
+      context: context,
+      title: book.title,
+      coverUrl: book.coverUrl,
+      seed: stableSeed(book.id),
+      spineSize: box.size,
+      startCenter: center,
+      startLean: _leans[book.id] ?? 0,
+      onCovered: () => onOpen(book, tag),
     );
+    if (mounted) setState(() => _pulledId = null);
+  }
 
-    return GestureDetector(
-      onTap: onTap,
-      child: AspectRatio(
-        aspectRatio: 2 / 3,
-        child: Stack(
-          clipBehavior: Clip.none,
+  void _showActions(Book book) {
+    HapticFeedback.mediumImpact();
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetCtx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Positioned.fill(
-              child: Hero(
-                tag: heroTag,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.22),
-                        blurRadius: 14,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: url.isEmpty
-                        ? fallback()
-                        : CachedNetworkImage(
-                            imageUrl: url,
-                            fit: BoxFit.cover,
-                            placeholder: (_, __) => Container(color: c.border),
-                            errorWidget: (_, __, ___) => fallback(),
-                          ),
-                  ),
-                ),
-              ),
+            ListTile(
+              leading: const Icon(Icons.shopping_bag_outlined),
+              title: const Text('Move to cart'),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                widget.onMoveToCart(book);
+              },
             ),
-            if (book.hasDiscount)
-              Positioned(
-                left: 8,
-                bottom: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: c.error,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    '-${book.discountPercent}%',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-            // Gold bookmark ribbon: tap to remove
-            Positioned(
-              top: -2,
-              right: 10,
-              child: Tooltip(
-                message: 'Remove from wishlist',
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: onRemove,
-                  child: ClipPath(
-                    clipper: _RibbonClipper(),
-                    child: Container(
-                      width: 28,
-                      height: 42,
-                      color: c.accent,
-                      alignment: const Alignment(0, -0.35),
-                      child: const Icon(
-                        Icons.close_rounded,
-                        size: 15,
-                        color: Color(0xFF1C1A17),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline_rounded),
+              title: const Text('Remove from wishlist'),
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                widget.onRemove(book);
+              },
             ),
           ],
         ),
       ),
     );
   }
-}
 
-class _RibbonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    return Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width, size.height)
-      ..lineTo(size.width / 2, size.height - 9)
-      ..lineTo(0, size.height)
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-class _Details extends StatefulWidget {
-  const _Details({
-    required this.book,
-    required this.onOpen,
-    required this.onMoveToCart,
-  });
-
-  final Book book;
-  final VoidCallback onOpen;
-  final Future<void> Function() onMoveToCart;
-
-  @override
-  State<_Details> createState() => _DetailsState();
-}
-
-class _DetailsState extends State<_Details> {
-  bool _busy = false;
-
-  Future<void> _move() async {
-    setState(() => _busy = true);
-    try {
-      await widget.onMoveToCart();
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
+  // ----------------------------------------------------------------- build
 
   @override
   Widget build(BuildContext context) {
-    final c = context.palette;
-    final theme = Theme.of(context);
-    final book = widget.book;
+    if (widget.books.isEmpty) return const SizedBox.shrink();
+    final dark = Theme.of(context).brightness == Brightness.dark;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: widget.onOpen,
-          behavior: HitTestBehavior.opaque,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(
+      builder: (context, box) {
+        final width = box.maxWidth;
+        final d = _dims(width);
+        return SizedBox(
+          width: width,
+          height: d.rowHeight,
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              Text(
-                book.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: c.textPrimary,
-                  fontWeight: FontWeight.w700,
-                  height: 1.15,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                book.authorName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: c.textSecondary,
-                ),
-              ),
-              const SizedBox(height: AppDimens.sm),
-              Row(
-                children: [
-                  Text(
-                    formatPrice(book.price),
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: c.primary,
-                      fontWeight: FontWeight.w700,
+              if (widget.showPlank)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: _kPlankH,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: dark
+                            ? const [Color(0xFF3A2E24), Color(0xFF241B14)]
+                            : const [Color(0xFFA27B52), Color(0xFF7C5A38)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: .25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                  ),
-                  if (book.hasDiscount && book.originalPrice != null) ...[
-                    const SizedBox(width: 6),
-                    Text(
-                      formatPrice(book.originalPrice!),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: c.textSecondary,
-                        decoration: TextDecoration.lineThrough,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        height: 1.5,
+                        color: Colors.white.withValues(alpha: .22),
                       ),
                     ),
-                  ],
-                ],
+                  ),
+                ),
+              Positioned.fill(
+                child: ValueListenableBuilder<double>(
+                  valueListenable: _tilt,
+                  builder: (context, t, _) {
+                    final placed = _place(d, width, t);
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        for (var i = 0; i < widget.books.length; i++)
+                          Positioned(
+                            left: placed[i].left,
+                            bottom: _kPlankH - 1,
+                            child: Transform.rotate(
+                              angle: placed[i].angle,
+                              alignment: placed[i].alignment,
+                              child: _tile(
+                                widget.books[i],
+                                d.w[i],
+                                d.h[i],
+                                placed[i].angle,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ],
           ),
-        ),
-        const SizedBox(height: AppDimens.sm),
-        SizedBox(
-          width: double.infinity,
-          child: book.inStock
-              ? ElevatedButton(
-                  onPressed: _busy ? null : _move,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(40),
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    textStyle: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  child: _busy
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.shopping_bag_outlined, size: 16),
-                            SizedBox(width: 6),
-                            Flexible(
-                              child: Text(
-                                'Move to cart',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                )
-              : OutlinedButton(
-                  onPressed: null,
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(40),
-                    textStyle: const TextStyle(fontSize: 13),
-                  ),
-                  child: const Text('Out of stock'),
-                ),
-        ),
-      ],
+        );
+      },
     );
   }
+
+  Widget _tile(Book book, double w, double h, double angle) {
+    _leans[book.id] = angle;
+    final key = _keys.putIfAbsent(book.id, () => GlobalKey());
+    return Opacity(
+      opacity: _pulledId == book.id ? 0 : 1,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _open(book),
+        onLongPress: () => _showActions(book),
+        child: DecoratedBox(
+          key: key,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: .28),
+                blurRadius: 6,
+                offset: const Offset(2, 1),
+              ),
+            ],
+          ),
+          child: BookSpine(
+            title: book.title,
+            coverUrl: book.coverUrl,
+            seed: stableSeed(book.id),
+            width: w,
+            height: h,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Dims {
+  _Dims(this.w, this.h, this.rowHeight);
+  final List<double> w;
+  final List<double> h;
+  final double rowHeight;
+}
+
+class _Placed {
+  _Placed({required this.left, required this.angle, required this.alignment});
+  final double left;
+  final double angle;
+  final Alignment alignment;
 }
