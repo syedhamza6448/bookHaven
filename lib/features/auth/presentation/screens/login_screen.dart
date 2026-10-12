@@ -297,10 +297,11 @@ class _Header extends StatelessWidget {
               shape: BoxShape.circle,
               color: AppColors.darkAccent,
             ),
-            child: const Icon(
-              Icons.auto_stories,
-              color: AppColors.lightPrimary,
-              size: 30,
+            child: Image.asset(
+              'assets/icons/app_icon_foreground.png',
+              width: 130,
+              height: 130,
+              fit: BoxFit.contain,
             ),
           ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
           const SizedBox(height: 14),

@@ -1,14 +1,13 @@
+import 'package:bookhaven/core/constants/app_colors.dart';
+import 'package:bookhaven/core/constants/app_dimens.dart';
+import 'package:bookhaven/core/router/app_routes.dart';
+import 'package:bookhaven/core/utils/validators.dart';
+import 'package:bookhaven/features/auth/presentation/providers/register_controller.dart';
 import 'package:bookhaven/shared/widgets/password_strength_meter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_dimens.dart';
-import '../../../../core/router/app_routes.dart';
-import '../../../../core/utils/validators.dart';
-import '../providers/register_controller.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
